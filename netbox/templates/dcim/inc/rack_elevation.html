@@ -23,6 +23,31 @@
     <ul class="rack rack_near_face">
         {% for u in primary_face %}
             {% if u.device %}
+                {% if u.device.devicebay_count %}
+
+                    {% for i,j in u.device.get_child_pairs %}
+                        <li class="occupied h1u" {% ifequal 1 face_id %} style="background-color: #{{ i.device_role.color }}"{% endifequal %}>
+                        {% ifequal 1 face_id %}
+                          <div style="width: 50%; float: left; border-right: 1px solid #474747;">
+                          <a href="{% url 'dcim:device' pk=i.pk %}" data-toggle="popover" data-trigger="hover" data-container="body" data-html="true"
+                             data-content="{{ i.device_role }}<br />{{ i.device_type.full_name }} ({{ i.device_type.u_height }}U){% if i.asset_tag %}<br />{{ i.asset_tag }}{% endif %}">
+                             {{ i.name|default:i.device_role }}
+                          </a>
+                          </div>
+                          <div style="width: 50%; float: left;">
+                          <a href="{% url 'dcim:device' pk=j.pk %}" data-toggle="popover" data-trigger="hover" data-container="body" data-html="true"
+                             data-content="{{ j.device_role }}<br />{{ j.device_type.full_name }} ({{ j.device_type.u_height }}U){% if j.asset_tag %}<br />{{ j.asset_tag }}{% endif %}">
+                             {{ j.name|default:j.device_role }}
+                          </a>
+                          </div>
+                        {% else %}
+                          <span style="width: 50%; float: left; border-right: 1px solid #474747;">{{ i.name|default:i.device_role }}</span>
+                          <span style="width: 50%; float: left">{{ j.name|default:j.device_role }}</span>
+                        {% endifequal %}
+                        </li>
+                    {% endfor %}
+
+                {% else %}
                 <li class="occupied h{{ u.device.device_type.u_height }}u"{% ifequal u.device.face face_id %} style="background-color: #{{ u.device.device_role.color }}"{% endifequal %}>
                     {% ifequal u.device.face face_id %}
                         <a href="{% url 'dcim:device' pk=u.device.pk %}" data-toggle="popover" data-trigger="hover" data-container="body" data-html="true"
@@ -36,6 +61,7 @@
                         <span>{{ u.device.name|default:u.device.device_role }}</span>
                     {% endifequal %}
                 </li>
+                {% endif %}
             {% else %}
                 <li class="available{% if u.id in reserved_units.keys %} reserved{% endif %}">
                     {% if perms.dcim.add_device %}

@@ -1147,6 +1147,13 @@ class Device(CreatedUpdatedModel, CustomFieldModel):
         """
         return Device.objects.filter(parent_bay__device=self.pk)
 
+    def get_child_pairs(self):
+        #return self.get_children()
+        #return izip(*[chain(self.get_children(), repeat(None, 1))]*2)
+        child = self.get_children()
+        l = len(child)
+        return [[child[i], child[i + l//2]] for i in range(0, l//2, 1)]
+
     def get_status_class(self):
         return STATUS_CLASSES[self.status]
 
