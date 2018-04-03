@@ -1148,7 +1148,8 @@ class Device(CreatedUpdatedModel, CustomFieldModel):
         return Device.objects.filter(parent_bay__device=self.pk)
 
     def get_child_pairs(self):
-        child = self.get_children()
+        child = list(self.get_children())
+        child.sort(key=lambda x: str(x.parent_bay))
         l = len(child)
         return [[child[i], child[i + l//2]] for i in range(0, l//2, 1)]
 
