@@ -19,6 +19,8 @@ from timezone_field import TimeZoneField
 from circuits.models import Circuit
 from extras.models import CustomFieldModel, CustomFieldValue, ImageAttachment
 from extras.rpc import RPC_CLIENTS
+from operator import attrgetter
+from natsort import natsorted
 from tenancy.models import Tenant
 from utilities.fields import ColorField, NullableCharField
 from utilities.managers import NaturalOrderByManager
@@ -1148,10 +1150,13 @@ class Device(CreatedUpdatedModel, CustomFieldModel):
         return Device.objects.filter(parent_bay__device=self.pk)
 
     def get_child_pairs(self):
-        child = list(self.get_children())
-        child.sort(key=lambda x: str(x.parent_bay))
-        l = len(child)
-        return [[child[i], child[i + l//2]] for i in range(0, l//2, 1)]
+        x = DeviceBay.objects.filter(device=self).select_related('installed_device__device_type__manufacturer')
+        device_bays = natsorted(
+            x,
+            key=attrgetter('name')
+        )
+        l = len(device_bays)
+        return [[device_bays[i], device_bays[i + l//2]] for i in range(0, l//2, 1)]
 
     def get_status_class(self):
         return STATUS_CLASSES[self.status]
