@@ -965,6 +965,12 @@ class Device(CreatedUpdatedModel, CustomFieldModel):
                 'face': "Must specify rack face when defining rack position.",
             })
 
+        # Prevent 0U devices from being assigned to a specific position
+        if self.position and self.device_type.u_height == 0:
+            raise ValidationError({
+                'position': "A U0 device type ({}) cannot be assigned to a rack position.".format(self.device_type)
+            })
+
         if self.rack:
 
             try:
@@ -1216,8 +1222,8 @@ class ConsoleServerPortManager(models.Manager):
     def get_queryset(self):
         # Pad any trailing digits to effect natural sorting
         return super(ConsoleServerPortManager, self).get_queryset().extra(select={
-            'name_padded': "CONCAT(REGEXP_REPLACE(dcim_consoleserverport.name, '\d+$', ''), "
-                           "LPAD(SUBSTRING(dcim_consoleserverport.name FROM '\d+$'), 8, '0'))",
+            'name_padded': r"CONCAT(REGEXP_REPLACE(dcim_consoleserverport.name, '\d+$', ''), "
+                           r"LPAD(SUBSTRING(dcim_consoleserverport.name FROM '\d+$'), 8, '0'))",
         }).order_by('device', 'name_padded')
 
 
@@ -1247,7 +1253,7 @@ class ConsoleServerPort(models.Model):
             raise ValidationError("Console server ports must be assigned to devices.")
         device_type = self.device.device_type
         if not device_type.is_console_server:
-            raise ValidationError("The {} {} device type not support assignment of console server ports.".format(
+            raise ValidationError("The {} {} device type does not support assignment of console server ports.".format(
                 device_type.manufacturer, device_type
             ))
 
@@ -1298,8 +1304,8 @@ class PowerOutletManager(models.Manager):
     def get_queryset(self):
         # Pad any trailing digits to effect natural sorting
         return super(PowerOutletManager, self).get_queryset().extra(select={
-            'name_padded': "CONCAT(REGEXP_REPLACE(dcim_poweroutlet.name, '\d+$', ''), "
-                           "LPAD(SUBSTRING(dcim_poweroutlet.name FROM '\d+$'), 8, '0'))",
+            'name_padded': r"CONCAT(REGEXP_REPLACE(dcim_poweroutlet.name, '\d+$', ''), "
+                           r"LPAD(SUBSTRING(dcim_poweroutlet.name FROM '\d+$'), 8, '0'))",
         }).order_by('device', 'name_padded')
 
 
@@ -1329,7 +1335,7 @@ class PowerOutlet(models.Model):
             raise ValidationError("Power outlets must be assigned to devices.")
         device_type = self.device.device_type
         if not device_type.is_pdu:
-            raise ValidationError("The {} {} device type not support assignment of power outlets.".format(
+            raise ValidationError("The {} {} device type does not support assignment of power outlets.".format(
                 device_type.manufacturer, device_type
             ))
 
@@ -1414,7 +1420,7 @@ class Interface(models.Model):
         if self.device is not None:
             device_type = self.device.device_type
             if not device_type.is_network_device:
-                raise ValidationError("The {} {} device type not support assignment of network interfaces.".format(
+                raise ValidationError("The {} {} device type does not support assignment of network interfaces.".format(
                     device_type.manufacturer, device_type
                 ))
 
@@ -1546,6 +1552,18 @@ class InterfaceConnection(models.Model):
             if self.interface_a == self.interface_b:
                 raise ValidationError({
                     'interface_b': "Cannot connect an interface to itself."
+                })
+            if self.interface_a.form_factor in NONCONNECTABLE_IFACE_TYPES:
+                raise ValidationError({
+                    'interface_a': '{} is not a connectable interface type.'.format(
+                        self.interface_a.get_form_factor_display()
+                    )
+                })
+            if self.interface_b.form_factor in NONCONNECTABLE_IFACE_TYPES:
+                raise ValidationError({
+                    'interface_b': '{} is not a connectable interface type.'.format(
+                        self.interface_b.get_form_factor_display()
+                    )
                 })
         except ObjectDoesNotExist:
             pass
