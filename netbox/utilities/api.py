@@ -74,6 +74,12 @@ class ChoiceField(Field):
         return {'value': obj, 'label': self._choices[obj]}
 
     def to_internal_value(self, data):
+        # Hotwiring boolean values
+        if hasattr(data, 'lower'):
+            if data.lower() == 'true':
+                return True
+            if data.lower() == 'false':
+                return False
         return data
 
 
@@ -164,7 +170,9 @@ class WritableNestedSerializer(ModelSerializer):
         if data is None:
             return None
         try:
-            return self.Meta.model.objects.get(pk=data)
+            return self.Meta.model.objects.get(pk=int(data))
+        except (TypeError, ValueError):
+            raise ValidationError("Primary key must be an integer")
         except ObjectDoesNotExist:
             raise ValidationError("Invalid ID")
 

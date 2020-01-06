@@ -82,7 +82,7 @@ class NestedClusterSerializer(WritableNestedSerializer):
 #
 
 # Cannot import ipam.api.NestedIPAddressSerializer due to circular dependency
-class VirtualMachineIPAddressSerializer(serializers.ModelSerializer):
+class VirtualMachineIPAddressSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='ipam-api:ipaddress-detail')
 
     class Meta:
@@ -146,7 +146,7 @@ class InterfaceVLANSerializer(WritableNestedSerializer):
 class InterfaceSerializer(TaggitSerializer, ValidatedModelSerializer):
     virtual_machine = NestedVirtualMachineSerializer()
     form_factor = ChoiceField(choices=IFACE_FF_CHOICES, default=IFACE_FF_VIRTUAL, required=False)
-    mode = ChoiceField(choices=IFACE_MODE_CHOICES, required=False)
+    mode = ChoiceField(choices=IFACE_MODE_CHOICES, required=False, allow_null=True)
     untagged_vlan = InterfaceVLANSerializer(required=False, allow_null=True)
     tagged_vlans = SerializedPKRelatedField(
         queryset=VLAN.objects.all(),
