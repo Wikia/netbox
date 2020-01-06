@@ -29,8 +29,13 @@ Update the following static libraries to their most recent stable release:
 
 * Bootstrap 3
 * Font Awesome 4
+* Select2
 * jQuery
 * jQuery UI
+
+## Create a new Release Notes Page
+
+Create a file at `/docs/release-notes/X.Y.md` to establish the release notes for the new release. Add the file to the table of contents within `mkdocs.yml`.
 
 ## Manually Perform a New Install
 
@@ -48,9 +53,9 @@ Close the release milestone on GitHub. Ensure that there are no remaining open i
 
 Ensure that continuous integration testing on the `develop` branch is completing successfully.
 
-## Update VERSION
+## Update Version and Changelog
 
-Update the `VERSION` constant in `settings.py` to the new release.
+Update the `VERSION` constant in `settings.py` to the new release version and annotate the current data in the release notes for the new version.
 
 ## Submit a Pull Request
 
@@ -60,7 +65,7 @@ Once CI has completed on the PR, merge it.
 
 ## Create a New Release
 
-Draft a [new release](https://github.com/digitalocean/netbox/releases/new) with the following parameters.
+Draft a [new release](https://github.com/netbox-community/netbox/releases/new) with the following parameters.
 
 * **Tag:** Current version (e.g. `v2.3.4`)
 * **Target:** `master`

@@ -12,7 +12,7 @@ A NetBox report is a mechanism for validating the integrity of data within NetBo
 
 ## Writing Reports
 
-Reports must be saved as files in the [`REPORTS_ROOT`](../configuration/optional-settings/#reports_root) path (which defaults to `netbox/reports/`). Each file created within this path is considered a separate module. Each module holds one or more reports (Python classes), each of which performs a certain function. The logic of each report is broken into discrete test methods, each of which applies a small portion of the logic comprising the overall test.
+Reports must be saved as files in the [`REPORTS_ROOT`](../../configuration/optional-settings/#reports_root) path (which defaults to `netbox/reports/`). Each file created within this path is considered a separate module. Each module holds one or more reports (Python classes), each of which performs a certain function. The logic of each report is broken into discrete test methods, each of which applies a small portion of the logic comprising the overall test.
 
 !!! warning
     The reports path includes a file named `__init__.py`, which registers the path as a Python module. Do not delete this file.
@@ -43,8 +43,8 @@ class DeviceConnectionsReport(Report):
     def test_console_connection(self):
 
         # Check that every console port for every active device has a connection defined.
-        for console_port in ConsolePort.objects.select_related('device').filter(device__status=DEVICE_STATUS_ACTIVE):
-            if console_port.cs_port is None:
+        for console_port in ConsolePort.objects.prefetch_related('device').filter(device__status=DEVICE_STATUS_ACTIVE):
+            if console_port.connected_endpoint is None:
                 self.log_failure(
                     console_port.device,
                     "No console connection defined for {}".format(console_port.name)
@@ -63,7 +63,7 @@ class DeviceConnectionsReport(Report):
         for device in Device.objects.filter(status=DEVICE_STATUS_ACTIVE):
             connected_ports = 0
             for power_port in PowerPort.objects.filter(device=device):
-                if power_port.power_outlet is not None:
+                if power_port.connected_endpoint is not None:
                     connected_ports += 1
                     if power_port.connection_status == CONNECTION_STATUS_PLANNED:
                         self.log_warning(
@@ -128,4 +128,4 @@ Reports can be run on the CLI by invoking the management command:
 python3 manage.py runreport <module>
 ```
 
-One or more report modules may be specified.
+where ``<module>`` is the name of the python file in the ``reports`` directory without the ``.py`` extension.  One or more report modules may be specified.

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-
 # Circuit statuses
 CIRCUIT_STATUS_DEPROVISIONING = 0
 CIRCUIT_STATUS_ACTIVE = 1

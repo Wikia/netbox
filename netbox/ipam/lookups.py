@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
-from django.db.models import Lookup, Transform, IntegerField
-from django.db.models import lookups
+from django.db.models import IntegerField, Lookup, Transform, lookups
 
 
 class NetFieldDecoratorMixin(object):

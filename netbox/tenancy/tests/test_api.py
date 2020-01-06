@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.urls import reverse
 from rest_framework import status
 
@@ -11,7 +9,7 @@ class TenantGroupTest(APITestCase):
 
     def setUp(self):
 
-        super(TenantGroupTest, self).setUp()
+        super().setUp()
 
         self.tenantgroup1 = TenantGroup.objects.create(name='Test Tenant Group 1', slug='test-tenant-group-1')
         self.tenantgroup2 = TenantGroup.objects.create(name='Test Tenant Group 2', slug='test-tenant-group-2')
@@ -30,6 +28,16 @@ class TenantGroupTest(APITestCase):
         response = self.client.get(url, **self.header)
 
         self.assertEqual(response.data['count'], 3)
+
+    def test_list_tenantgroups_brief(self):
+
+        url = reverse('tenancy-api:tenantgroup-list')
+        response = self.client.get('{}?brief=1'.format(url), **self.header)
+
+        self.assertEqual(
+            sorted(response.data['results'][0]),
+            ['id', 'name', 'slug', 'tenant_count', 'url']
+        )
 
     def test_create_tenantgroup(self):
 
@@ -102,7 +110,7 @@ class TenantTest(APITestCase):
 
     def setUp(self):
 
-        super(TenantTest, self).setUp()
+        super().setUp()
 
         self.tenantgroup1 = TenantGroup.objects.create(name='Test Tenant Group 1', slug='test-tenant-group-1')
         self.tenantgroup2 = TenantGroup.objects.create(name='Test Tenant Group 2', slug='test-tenant-group-2')
@@ -123,6 +131,16 @@ class TenantTest(APITestCase):
         response = self.client.get(url, **self.header)
 
         self.assertEqual(response.data['count'], 3)
+
+    def test_list_tenants_brief(self):
+
+        url = reverse('tenancy-api:tenant-list')
+        response = self.client.get('{}?brief=1'.format(url), **self.header)
+
+        self.assertEqual(
+            sorted(response.data['results'][0]),
+            ['id', 'name', 'slug', 'url']
+        )
 
     def test_create_tenant(self):
 

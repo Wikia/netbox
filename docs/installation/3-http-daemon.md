@@ -1,7 +1,7 @@
 We'll set up a simple WSGI front end using [gunicorn](http://gunicorn.org/) for the purposes of this guide. For web servers, we provide example configurations for both [nginx](https://www.nginx.com/resources/wiki/) and [Apache](http://httpd.apache.org/docs/2.4). (You are of course free to use whichever combination of HTTP and WSGI services you'd like.) We'll also use [supervisord](http://supervisord.org/) to enable service persistence.
 
 !!! info
-    For the sake of brevity, only Ubuntu 16.04 instructions are provided here, but this sort of web server and WSGI configuration is not unique to NetBox. Please consult your distribution's documentation for assistance if needed.
+    For the sake of brevity, only Ubuntu 18.04 instructions are provided here, but this sort of web server and WSGI configuration is not unique to NetBox. Please consult your distribution's documentation for assistance if needed.
 
 # Web Server Installation
 
@@ -32,7 +32,6 @@ server {
         proxy_set_header X-Forwarded-Host $server_name;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
-        add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
     }
 }
 ```
@@ -56,7 +55,7 @@ To enable SSL, consider this guide on [securing nginx with Let's Encrypt](https:
 ## Option B: Apache
 
 ```no-highlight
-# apt-get install -y apache2
+# apt-get install -y apache2 libapache2-mod-wsgi-py3
 ```
 
 Once Apache is installed, proceed with the following configuration (Be sure to modify the `ServerName` appropriately):
@@ -108,7 +107,7 @@ Install gunicorn:
 # pip3 install gunicorn
 ```
 
-Save the following configuration in the root netbox installation path as `gunicorn_config.py` (e.g. `/opt/netbox/gunicorn_config.py` per our example installation). Be sure to verify the location of the gunicorn executable on your server (e.g. `which gunicorn`) and to update the `pythonpath` variable if needed. If using CentOS/RHEL, change the username from `www-data` to `nginx` or `apache`.
+Save the following configuration in the root netbox installation path as `gunicorn_config.py` (e.g. `/opt/netbox/gunicorn_config.py` per our example installation). Be sure to verify the location of the gunicorn executable on your server (e.g. `which gunicorn`) and to update the `pythonpath` variable if needed. If using CentOS/RHEL, change the username from `www-data` to `nginx` or `apache`. More info on `max_requests` can be found in the [gunicorn docs](https://docs.gunicorn.org/en/stable/settings.html#max-requests).
 
 ```no-highlight
 command = '/usr/bin/gunicorn'
@@ -116,6 +115,8 @@ pythonpath = '/opt/netbox/netbox'
 bind = '127.0.0.1:8001'
 workers = 3
 user = 'www-data'
+max_requests = 5000
+max_requests_jitter = 500
 ```
 
 # supervisord Installation

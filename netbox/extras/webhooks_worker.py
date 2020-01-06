@@ -1,28 +1,33 @@
 import hashlib
 import hmac
-import requests
 import json
 
+import requests
 from django_rq import job
 from rest_framework.utils.encoders import JSONEncoder
 
-from extras.constants import WEBHOOK_CT_JSON, WEBHOOK_CT_X_WWW_FORM_ENCODED, OBJECTCHANGE_ACTION_CHOICES
+from .constants import *
 
 
 @job('default')
-def process_webhook(webhook, data, model_class, event, timestamp):
+def process_webhook(webhook, data, model_name, event, timestamp, username, request_id):
     """
     Make a POST request to the defined Webhook
     """
     payload = {
         'event': dict(OBJECTCHANGE_ACTION_CHOICES)[event].lower(),
         'timestamp': timestamp,
-        'model': model_class._meta.model_name,
+        'model': model_name,
+        'username': username,
+        'request_id': request_id,
         'data': data
     }
     headers = {
         'Content-Type': webhook.get_http_content_type_display(),
     }
+    if webhook.additional_headers:
+        headers.update(webhook.additional_headers)
+
     params = {
         'method': 'POST',
         'url': webhook.payload_url,
@@ -47,6 +52,8 @@ def process_webhook(webhook, data, model_class, event, timestamp):
 
     with requests.Session() as session:
         session.verify = webhook.ssl_verification
+        if webhook.ca_file_path:
+            session.verify = webhook.ca_file_path
         response = session.send(prepared_request)
 
     if response.status_code >= 200 and response.status_code <= 299:

@@ -30,7 +30,7 @@ psql -c 'create database netbox'
 psql netbox < netbox.sql
 ```
 
-Keep in mind that PostgreSQL user accounts and permissions are not included with the dump: You will need to create those manually if you want to fully replicate the original database (see the [installation docs](installation/1-postgresql.md)). When setting up a development instance of NetBox, it's strongly recommended to use different credentials anyway.
+Keep in mind that PostgreSQL user accounts and permissions are not included with the dump: You will need to create those manually if you want to fully replicate the original database (see the [installation docs](../installation/1-postgresql.md)). When setting up a development instance of NetBox, it's strongly recommended to use different credentials anyway.
 
 ## Export the Database Schema
 
@@ -38,6 +38,11 @@ If you want to export only the database schema, and not the data itself (e.g. fo
 
 ```no-highlight
 pg_dump -s netbox > netbox_schema.sql
+```
+If you are migrating your instance of NetBox to a different machine, please make sure you invalidate the cache by performing this command:
+
+```no-highlight
+python3 manage.py invalidate all
 ```
 
 ---

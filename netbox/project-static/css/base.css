@@ -42,15 +42,28 @@ footer p {
     }
 }
 
-/* Hide the search bar in the navigation menu on displays less than 1200px wide */
-@media (max-width: 1199px) {
+/* Hide the search bar in the navigation menu on displays less than 1250px wide */
+@media (max-width: 1249px) {
     #navbar_search {
         display: none;
     }
 }
 
-/* Collapse the nav menu on displays less than 960px wide */
-@media (max-width: 959px) {
+/* Printer friendly CSS class and various fixes for printing. */
+@media print {
+    body {
+        padding-top: 0px;
+    }
+    a[href]:after {
+        content: none !important;
+    }
+    .noprint {
+        display: none !important;
+    }
+}
+
+/* Collapse the nav menu on displays less than 980px wide */
+@media (max-width: 979px) {
     .navbar-header {
         float: none;
     }
@@ -120,6 +133,7 @@ input[name="pk"] {
     margin-top: 0;
 }
 
+
 /* Tables */
 th.pk, td.pk {
     padding-bottom: 6px;
@@ -135,10 +149,16 @@ table.attr-table td:nth-child(1) {
 .table-headings th {
     background-color: #f5f5f5;
 }
+td.min-width {
+    width: 1%;
+}
 
 /* Paginator */
 div.paginator {
     margin-bottom: 20px;
+}
+div.paginator form {
+    margin-bottom: 6px;
 }
 nav ul.pagination {
     margin-top: 0;
@@ -390,6 +410,22 @@ table.report th a {
     top: -51px;
 }
 
+/* Rendered Markdown */
+.rendered-markdown table {
+    width: 100%;
+}
+.rendered-markdown th {
+    border-bottom: 2px solid #dddddd;
+    padding: 8px;
+}
+.rendered-markdown td {
+    border-top: 1px solid #dddddd;
+    padding: 8px;
+}
+.rendered-markdown :last-child {
+    margin-bottom: 0;
+}
+
 /* AJAX loader */
 .loading {
     position: fixed;
@@ -416,6 +452,19 @@ table.report th a {
 }
 
 /* Misc */
+.color-block {
+    display: block;
+    width: 80px;
+    border: 1px solid grey;
+}
+.inline-color-block {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    border: 1px solid grey;
+    border-radius: .25em;
+    vertical-align: middle;
+}
 .text-nowrap {
     white-space: nowrap;
 }
@@ -441,6 +490,7 @@ ul.nav-tabs, ul.nav-pills {
 /* Fix progress bar margin inside table cells */
 td .progress {
     margin-bottom: 0;
+    min-width: 100px;
 }
 textarea {
     font-family: Consolas, Lucida Console, monospace;

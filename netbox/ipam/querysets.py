@@ -1,14 +1,12 @@
-from __future__ import unicode_literals
-
-from utilities.sql import NullsFirstQuerySet
+from django.db.models import QuerySet
 
 
-class PrefixQuerySet(NullsFirstQuerySet):
+class PrefixQuerySet(QuerySet):
 
     def annotate_depth(self, limit=None):
         """
         Iterate through a QuerySet of Prefixes and annotate the hierarchical level of each. While it would be preferable
-        to do this using .extra() on the QuerySet to count the unique parents of each prefix, that approach introduces
+        to do this using .annotate() on the QuerySet to count the unique parents of each prefix, that approach introduces
         performance issues at scale.
 
         Because we're adding a non-field attribute to the model, annotation must be made *after* any QuerySet

@@ -44,6 +44,14 @@ BASE_PATH = 'netbox/'
 
 ---
 
+## CACHE_TIMEOUT
+
+Default: 900
+
+The number of seconds to retain cache entries before automatically invalidating them.
+
+---
+
 ## CHANGELOG_RETENTION
 
 Default: 90
@@ -64,7 +72,13 @@ If True, cross-origin resource sharing (CORS) requests will be accepted from all
 
 ## CORS_ORIGIN_REGEX_WHITELIST
 
-These settings specify a list of origins that are authorized to make cross-site API requests. Use `CORS_ORIGIN_WHITELIST` to define a list of exact hostnames, or `CORS_ORIGIN_REGEX_WHITELIST` to define a set of regular expressions. (These settings have no effect if `CORS_ORIGIN_ALLOW_ALL` is True.)
+These settings specify a list of origins that are authorized to make cross-site API requests. Use `CORS_ORIGIN_WHITELIST` to define a list of exact hostnames, or `CORS_ORIGIN_REGEX_WHITELIST` to define a set of regular expressions. (These settings have no effect if `CORS_ORIGIN_ALLOW_ALL` is True.) For example:
+
+```
+CORS_ORIGIN_WHITELIST = [
+    'https://example.com',
+]
+```
 
 ---
 
@@ -89,6 +103,30 @@ In order to send email, NetBox needs an email server configured. The following i
 
 ---
 
+## EXEMPT_VIEW_PERMISSIONS
+
+Default: Empty list
+
+A list of models to exempt from the enforcement of view permissions. Models listed here will be viewable by all users and by anonymous users.
+
+List models in the form `<app>.<model>`. For example:
+
+```
+EXEMPT_VIEW_PERMISSIONS = [
+    'dcim.site',
+    'dcim.region',
+    'ipam.prefix',
+]
+```
+
+To exempt _all_ models from view permission enforcement, set the following. (Note that `EXEMPT_VIEW_PERMISSIONS` must be an iterable.)
+
+```
+EXEMPT_VIEW_PERMISSIONS = ['*']
+```
+
+---
+
 # ENFORCE_GLOBAL_UNIQUE
 
 Default: False
@@ -101,7 +139,7 @@ Enforcement of unique IP space can be toggled on a per-VRF basis. To enforce uni
 
 By default, all messages of INFO severity or higher will be logged to the console. Additionally, if `DEBUG` is False and email access has been configured, ERROR and CRITICAL messages will be emailed to the users defined in `ADMINS`.
 
-The Django framework on which NetBox runs allows for the customization of logging, e.g. to write logs to file. Please consult the [Django logging documentation](https://docs.djangoproject.com/en/1.11/topics/logging/) for more information on configuring this setting. Below is an example which will write all INFO and higher messages to a file:
+The Django framework on which NetBox runs allows for the customization of logging, e.g. to write logs to file. Please consult the [Django logging documentation](https://docs.djangoproject.com/en/stable/topics/logging/) for more information on configuring this setting. Below is an example which will write all INFO and higher messages to a file:
 
 ```
 LOGGING = {
@@ -133,6 +171,14 @@ Setting this to True will permit only authenticated users to access any part of 
 
 ---
 
+## LOGIN_TIMEOUT
+
+Default: 1209600 seconds (14 days)
+
+The liftetime (in seconds) of the authentication cookie issued to a NetBox user upon login.
+
+---
+
 ## MAINTENANCE_MODE
 
 Default: False
@@ -154,6 +200,14 @@ An API consumer can request an arbitrary number of objects by appending the "lim
 Default: $BASE_DIR/netbox/media/
 
 The file path to the location where media files (such as image attachments) are stored. By default, this is the `netbox/media/` directory within the base NetBox installation path.
+
+---
+
+## METRICS_ENABLED
+
+Default: False
+
+Toggle exposing Prometheus metrics at `/metrics`. See the [Prometheus Metrics](../../additional-features/prometheus-metrics/) documentation for more details.
 
 ---
 
@@ -223,6 +277,22 @@ The file path to the location where custom reports will be kept. By default, thi
 
 ---
 
+## SCRIPTS_ROOT
+
+Default: $BASE_DIR/netbox/scripts/
+
+The file path to the location where custom scripts will be kept. By default, this is the `netbox/scripts/` directory within the base NetBox installation path.
+
+---
+
+## SESSION_FILE_PATH
+
+Default: None
+
+Session data is used to track authenticated users when they access NetBox. By default, NetBox stores session data in the PostgreSQL database. However, this inhibits authentication to a standby instance of NetBox without write access to the database. Alternatively, a local file path may be specified here and NetBox will store session data as files instead of using the database. Note that the user as which NetBox runs must have read and write permissions to this path.
+
+---
+
 ## TIME_ZONE
 
 Default: UTC
@@ -235,13 +305,13 @@ The time zone NetBox will use when dealing with dates and times. It is recommend
 
 Default: False
 
-Enable this option to run the webhook backend. See the docs section on the webhook backend [here](../miscellaneous/webhooks/) for more information on setup and use.
+Enable this option to run the webhook backend. See the docs section on the webhook backend [here](../../additional-features/webhooks/) for more information on setup and use.
 
 ---
 
 ## Date and Time Formatting
 
-You may define custom formatting for date and times. For detailed instructions on writing format strings, please see [the Django documentation](https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date).
+You may define custom formatting for date and times. For detailed instructions on writing format strings, please see [the Django documentation](https://docs.djangoproject.com/en/stable/ref/templates/builtins/#date).
 
 Defaults:
 
@@ -253,49 +323,3 @@ SHORT_TIME_FORMAT = 'H:i:s'          # 13:23:00
 DATETIME_FORMAT = 'N j, Y g:i a'     # June 26, 2016 1:23 p.m.
 SHORT_DATETIME_FORMAT = 'Y-m-d H:i'  # 2016-06-27 13:23
 ```
-
----
-
-## Redis Connection Settings
-
-[Redis](https://redis.io/) is a key-value store which functions as a very lightweight database. It is required when enabling NetBox [webhooks](../miscellaneous/webhooks/). A Redis connection is configured using a dictionary similar to the following:
-
-```
-REDIS = {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'PASSWORD': '',
-    'DATABASE': 0,
-    'DEFAULT_TIMEOUT': 300,
-}
-```
-
-### DATABASE
-
-Default: 0
-
-The Redis database ID.
-
-### DEFAULT_TIMEOUT
-
-Default: 300
-
-The timeout value to use when connecting to the Redis server (in seconds).
-
-### HOST
-
-Default: localhost
-
-The hostname or IP address of the Redis server.
-
-### PORT
-
-Default: 6379
-
-The TCP port to use when connecting to the Redis server.
-
-### PASSWORD
-
-Default: None
-
-The password to use when authenticating to the Redis server (optional).

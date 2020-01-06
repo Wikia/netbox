@@ -4,6 +4,9 @@ The NetBox API employs token-based authentication. For convenience, cookie authe
 
 A token is a unique identifier that identifies a user to the API. Each user in NetBox may have one or more tokens which he or she can use to authenticate to the API. To create a token, navigate to the API tokens page at `/user/api-tokens/`.
 
+!!! note
+    The creation and modification of API tokens can be restricted per user by an administrator. If you don't see an option to create an API token, ask an administrator to grant you access.
+
 Each token contains a 160-bit key represented as 40 hexadecimal characters. When creating a token, you'll typically leave the key field blank so that a random key will be automatically generated. However, NetBox allows you to specify a key in case you need to restore a previously deleted token to operation.
 
 By default, a token can be used for all operations available via the API. Deselecting the "write enabled" option will restrict API requests made with the token to read operations (e.g. GET) only.
@@ -24,7 +27,7 @@ $ curl -H "Accept: application/json; indent=4" http://localhost/api/dcim/sites/
 }
 ```
 
-However, if the [`LOGIN_REQUIRED`](../configuration/optional-settings/#login_required) configuration setting has been set to `True`, all requests must be authenticated.
+However, if the [`LOGIN_REQUIRED`](../../configuration/optional-settings/#login_required) configuration setting has been set to `True`, all requests must be authenticated.
 
 ```
 $ curl -H "Accept: application/json; indent=4" http://localhost/api/dcim/sites/

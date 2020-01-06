@@ -12,17 +12,16 @@
             <li{% ifequal active_tab "profile" %} class="active"{% endifequal %}>
                 <a href="{% url 'user:profile' %}">Profile</a>
             </li>
-            <li{% ifequal active_tab "change_password" %} class="active"{% endifequal %}>
-                <a href="{% url 'user:change_password' %}">Change Password</a>
-            </li>
+            {% if not request.user.ldap_username %}
+                <li{% ifequal active_tab "change_password" %} class="active"{% endifequal %}>
+                    <a href="{% url 'user:change_password' %}">Change Password</a>
+                </li>
+            {% endif %}
             <li{% ifequal active_tab "api_tokens" %} class="active"{% endifequal %}>
                 <a href="{% url 'user:token_list' %}">API Tokens</a>
             </li>
             <li{% ifequal active_tab "userkey" %} class="active"{% endifequal %}>
                 <a href="{% url 'user:userkey' %}">User Key</a>
-            </li>
-            <li{% ifequal active_tab "recent_activity" %} class="active"{% endifequal %}>
-                <a href="{% url 'user:recent_activity' %}">Recent Activity</a>
             </li>
         </ul>
     </div>
